@@ -1,6 +1,6 @@
-# studyjam
+# GPA calculator
 
-A new Flutter project.
+A new Flutter app, this time it is "GPA Calculator" ..
 
 ## Getting Started
 
