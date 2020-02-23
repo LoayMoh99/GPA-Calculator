@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class SecondPage extends StatefulWidget {
+  final double cummgpa;
+  final int totalHrs;
+  SecondPage({@required this.cummgpa,@required this.totalHrs});
   @override
-  _SecondPageState createState() => _SecondPageState();
+  _SecondPageState createState() => _SecondPageState(cgpa:cummgpa , tHrs:totalHrs);
 }
 
 class _SecondPageState extends State<SecondPage> {
+  final double cgpa;
+  final int tHrs;
+  _SecondPageState({@required this.cgpa,@required this.tHrs});
   int noCourses=1;
   @override
   Widget build(BuildContext context) {
@@ -21,10 +27,10 @@ class _SecondPageState extends State<SecondPage> {
                   itemBuilder: (context, index) {
                     return Row(
                       children: <Widget>[
-                        ListTile(
-                          title: Text('Course ${index+1}'),
-                        ),
+                        Text('Course ${index+1} name:'),
                         //two dropdownboxes for hours and expected grade
+                        Text('Expected grade $cgpa'),
+                        Text("It'\s Credit hours $tHrs"),
                       ],
                     );
                   },

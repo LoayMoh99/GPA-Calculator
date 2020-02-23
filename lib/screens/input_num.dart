@@ -80,7 +80,9 @@ class InputPageState extends State<InputPage> {
                     if (!error) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SecondPage()),
+                        MaterialPageRoute(builder: (context) => SecondPage(
+                          cummgpa:cgpa , totalHrs:tHrs
+                        )),
                       );
                     } else {
                       //there is error(value unassigned)
