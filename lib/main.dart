@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:gpa_calculator/screens/input_num.dart';
+import 'package:gpa_calculator/screens/input_page/input_num.dart';
 import './utilities/my_theme.dart';
 
 void main() => runApp(MyApp());
@@ -12,6 +12,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: myTheme,
       home: InputPage(),
-      );
+    );
   }
 }
