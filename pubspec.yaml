@@ -10,6 +10,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^0.1.2
   rflutter_alert:
+  provider: ^4.1.1
 
 dev_dependencies:
   flutter_test:

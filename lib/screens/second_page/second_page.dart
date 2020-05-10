@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:gpa_calculator/screens/input_page/cumm_gpa.dart';
 import 'package:gpa_calculator/screens/result_page/result_page.dart';
+import 'package:gpa_calculator/screens/second_page/calculate_gpa.dart';
 import 'package:gpa_calculator/utilities/custom_droplist.dart';
 import 'package:gpa_calculator/utilities/gpa_grades.dart';
+import 'package:provider/provider.dart';
 
 class SecondPage extends StatefulWidget {
   final String routeName = "/second";
@@ -17,46 +19,12 @@ class _SecondPageState extends State<SecondPage> {
   int noCourses;
   List<CustomDropDownList> myList = [];
 
-  generateCustomDropDownList(int noCourses) {
-    for (int i = myList.length; i < noCourses; i++) {
-      CustomDropDownList ddl = new CustomDropDownList();
-      myList.add(ddl);
-      myList[i].dropdownMenuItemsGPA =
-          buildDropDownMenuItemsGPA(myList[i].gpaGrades);
-      myList[i].dropdownMenuItemsCHS =
-          buildDropDownMenuItemsCHS(myList[i].creditHours);
-      myList[i].selectedGPA = myList[i].dropdownMenuItemsGPA[1].value;
-      myList[i].selectedHours = myList[i].dropdownMenuItemsCHS[2].value;
-    }
-  }
-
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     noCourses = 1;
-    generateCustomDropDownList(noCourses);
-  }
-
-  List<DropdownMenuItem<GPA>> buildDropDownMenuItemsGPA(List<GPA> gpaGrades) {
-    List<DropdownMenuItem<GPA>> items = [];
-    for (GPA gpa in gpaGrades) {
-      items.add(DropdownMenuItem(
-        value: gpa,
-        child: Text(gpa.gpaGrade),
-      ));
-    }
-    return items;
-  }
-
-  List<DropdownMenuItem<int>> buildDropDownMenuItemsCHS(List<int> creditHours) {
-    List<DropdownMenuItem<int>> items = [];
-    for (int hour in creditHours) {
-      items.add(DropdownMenuItem(
-        value: hour,
-        child: Text(hour.toString()),
-      ));
-    }
-    return items;
+    Provider.of<GPACalculate>(context)
+        .generateCustomDropDownList(noCourses, myList);
   }
 
   void onChangedGPAgrade(GPA selectedGPA, int index) {
@@ -101,18 +69,6 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-  double calculateGPA(List<CustomDropDownList> myList) {
-    int sumHours = 0;
-    double sumGPAs = 0.0;
-    print(myList.length);
-    for (int i = 0; i < myList.length; i++) {
-      sumHours += myList[i].selectedHours;
-      sumGPAs += myList[i].selectedGPA.gpaWeight * myList[i].selectedHours;
-    }
-    return (widget.cummgpa.gpa * widget.cummgpa.tHrs + sumGPAs) /
-        (widget.cummgpa.tHrs + sumHours);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,7 +96,9 @@ class _SecondPageState extends State<SecondPage> {
                     top: MediaQuery.of(context).size.height * 0.01),
                 child: GestureDetector(
                   onTap: () {
-                    double gpa = calculateGPA(myList);
+                    double gpa =
+                        Provider.of<GPACalculate>(context, listen: false)
+                            .calculateGPA(myList, widget.cummgpa);
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => ResultPage(gpa),
@@ -181,7 +139,8 @@ class _SecondPageState extends State<SecondPage> {
                         myList = [];
                         noCourses = 1;
                         setState(() {
-                          generateCustomDropDownList(noCourses);
+                          Provider.of<GPACalculate>(context, listen: false)
+                              .generateCustomDropDownList(noCourses, myList);
                         });
                       },
                       child: Text(
@@ -200,7 +159,8 @@ class _SecondPageState extends State<SecondPage> {
                       onPressed: () {
                         noCourses--;
                         setState(() {
-                          generateCustomDropDownList(noCourses);
+                          Provider.of<GPACalculate>(context, listen: false)
+                              .generateCustomDropDownList(noCourses, myList);
                         });
                       },
                       child: Text(
@@ -219,7 +179,8 @@ class _SecondPageState extends State<SecondPage> {
                       onPressed: () {
                         noCourses++;
                         setState(() {
-                          generateCustomDropDownList(noCourses);
+                          Provider.of<GPACalculate>(context, listen: false)
+                              .generateCustomDropDownList(noCourses, myList);
                         });
                       },
                       child: Text(

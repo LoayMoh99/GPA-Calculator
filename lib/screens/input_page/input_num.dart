@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gpa_calculator/screens/input_page/cumm_gpa.dart';
+import 'package:gpa_calculator/screens/second_page/calculate_gpa.dart';
 import 'package:gpa_calculator/screens/second_page/second_page.dart';
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class InputPage extends StatefulWidget {
@@ -14,6 +16,7 @@ class InputPage extends StatefulWidget {
 class InputPageState extends State<InputPage> {
   TextEditingController myController = TextEditingController();
   TextEditingController myController2 = TextEditingController();
+
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -40,6 +43,8 @@ class InputPageState extends State<InputPage> {
       } else if (cgpa > 4.0) {
         error = true;
         errorMsg = "GPA can't be more than 4.0";
+      } else if (cgpa == 0.0 && tHrs > 0) {
+        tHrs = 0;
       }
     } catch (Exception) {
       error = true;
@@ -51,92 +56,121 @@ class InputPageState extends State<InputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                child: Center(
-                    child: Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 60, 30, 50),
-                  child: Image.asset('assets/images/gpaLogo.png'),
-                )),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    labelText: "C-GPA",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.yellow,
-                      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 40,
+              vertical: 20,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: Center(
+                      child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 40,
                     ),
-                    hintText: "Enter your Cumlative GPA here..",
-                  ),
-                  keyboardType: TextInputType.number,
-                  controller: myController,
+                    child: Image.asset('assets/images/gpaLogo.png'),
+                  )),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    labelText: "Total Hours",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.yellow,
-                      ),
-                    ),
-                    hintText: "Enter your Total Hours here..",
-                  ),
-                  keyboardType: TextInputType.number,
-                  controller: myController2,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.13),
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  color: Theme.of(context).accentColor,
-                  onPressed: () {
-                    puttingValues();
-                    if (!error) {
-                      CummGPA cummGpa = CummGPA(
-                        gpa: cgpa,
-                        tHrs: tHrs,
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SecondPage(
-                            cummgpa: cummGpa,
-                          ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: "C-GPA",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          color: Colors.yellow,
                         ),
-                      );
-                    } else {
-                      //there is error(value unassigned)
-                      Alert(context: context, title: 'ERROR!', desc: errorMsg)
-                          .show();
-                    }
-                  },
-                  child: Text(
-                    'Current Semester',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
+                      ),
+                      hintText: "Enter your Cumlative GPA here..",
+                    ),
+                    keyboardType: TextInputType.number,
+                    controller: myController,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: "Total Hours",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          color: Colors.yellow,
+                        ),
+                      ),
+                      hintText: "Enter your Total Hours here..",
+                    ),
+                    keyboardType: TextInputType.number,
+                    controller: myController2,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        'Recent Result: ',
+                        style: TextStyle(
+                          fontSize: 22,
+                        ),
+                      ),
+                      Text(
+                        '${Provider.of<GPACalculate>(context).recentGPA.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.04),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    color: Theme.of(context).accentColor,
+                    onPressed: () {
+                      puttingValues();
+                      if (!error) {
+                        CummGPA cummGpa = CummGPA(
+                          gpa: cgpa,
+                          tHrs: tHrs,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SecondPage(
+                              cummgpa: cummGpa,
+                            ),
+                          ),
+                        );
+                      } else {
+                        //there is error(value unassigned)
+                        Alert(context: context, title: 'ERROR!', desc: errorMsg)
+                            .show();
+                      }
+                    },
+                    child: Text(
+                      'Current Semester',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
