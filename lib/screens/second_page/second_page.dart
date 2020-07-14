@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:gpa_calculator/screens/input_page/cumm_gpa.dart';
-import 'package:gpa_calculator/screens/result_page/result_page.dart';
-import 'package:gpa_calculator/screens/second_page/calculate_gpa.dart';
-import 'package:gpa_calculator/utilities/custom_droplist.dart';
-import 'package:gpa_calculator/utilities/gpa_grades.dart';
+import 'package:flutter/material.dart';
+import 'package:gpa_calculator/utilities/router_generator.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../utilities/custom_droplist.dart';
+import '../../utilities/gpa_grades.dart';
+import '../input_page/cumm_gpa.dart';
+import 'calculate_gpa.dart';
 
 class SecondPage extends StatefulWidget {
   final String routeName = "/second";
@@ -53,8 +55,8 @@ class _SecondPageState extends State<SecondPage> {
             ),
           ),
         ),
-        //two dropdownboxes for hours and expected grade
 
+        //two dropdownboxes for hours and expected grade
         DropdownButton<GPA>(
           value: myList[index].selectedGPA,
           items: myList[index].dropdownMenuItemsGPA,
@@ -67,6 +69,11 @@ class _SecondPageState extends State<SecondPage> {
         ),
       ],
     );
+  }
+
+  _saveRecentResult(double gpa) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('recent_result', gpa);
   }
 
   @override
@@ -95,15 +102,17 @@ class _SecondPageState extends State<SecondPage> {
                 padding: EdgeInsets.only(
                     top: MediaQuery.of(context).size.height * 0.01),
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     double gpa =
                         Provider.of<GPACalculate>(context, listen: false)
                             .calculateGPA(myList, widget.cummgpa);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ResultPage(gpa),
-                      ),
-                    );
+                    _saveRecentResult(gpa);
+                    Navigator.push(
+                        context,
+                        RouterGenerator.generateRoute(RouteSettings(
+                          name: '/result',
+                          arguments: gpa,
+                        )));
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.92,
@@ -130,12 +139,9 @@ class _SecondPageState extends State<SecondPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      color: Theme.of(context).accentColor,
-                      onPressed: () {
+                    customButton(
+                      text: 'Clear ALL',
+                      onPress: () {
                         myList = [];
                         noCourses = 1;
                         setState(() {
@@ -143,59 +149,49 @@ class _SecondPageState extends State<SecondPage> {
                               .generateCustomDropDownList(noCourses, myList);
                         });
                       },
-                      child: Text(
-                        'Clear ALL',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                        ),
-                      ),
                     ),
-                    RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      color: Theme.of(context).accentColor,
-                      onPressed: () {
-                        noCourses--;
+                    customButton(
+                      text: 'Remove Recent',
+                      onPress: () {
+                        (noCourses <= 1) ? noCourses = 1 : noCourses--;
                         setState(() {
                           Provider.of<GPACalculate>(context, listen: false)
                               .generateCustomDropDownList(noCourses, myList);
                         });
                       },
-                      child: Text(
-                        'Remove Recent',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                        ),
-                      ),
                     ),
-                    RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      color: Theme.of(context).accentColor,
-                      onPressed: () {
+                    customButton(
+                      text: 'Add Course',
+                      onPress: () {
                         noCourses++;
                         setState(() {
                           Provider.of<GPACalculate>(context, listen: false)
                               .generateCustomDropDownList(noCourses, myList);
                         });
                       },
-                      child: Text(
-                        'ADD Course',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                        ),
-                      ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget customButton({String text, Function onPress}) {
+    return RaisedButton(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      color: Theme.of(context).accentColor,
+      onPressed: onPress,
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
         ),
       ),
     );

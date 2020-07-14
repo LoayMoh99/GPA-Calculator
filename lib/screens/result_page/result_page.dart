@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ResultPage extends StatelessWidget {
-  final String routeName = "/result";
   final double gpa;
-  ResultPage(this.gpa);
+  ResultPage({this.gpa});
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
