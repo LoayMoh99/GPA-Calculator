@@ -5,8 +5,9 @@ import 'package:gpa_calculator/utilities/gpa_grades.dart';
 
 class GPACalculate extends ChangeNotifier {
   double recentGPA = 0.0;
-  generateCustomDropDownList(
-      int noCourses, final List<CustomDropDownList> myList) {
+
+  ///this function 2 ddl for the hours and the gpa grade..
+  generateCustomDropDownList(int noCourses, List<CustomDropDownList> myList) {
     for (int i = myList.length; i < noCourses; i++) {
       CustomDropDownList ddl = new CustomDropDownList();
       myList.add(ddl);
@@ -19,6 +20,7 @@ class GPACalculate extends ChangeNotifier {
     }
   }
 
+  ///these are two helper functions for generating the 2xDropDownLists
   List<DropdownMenuItem<GPA>> buildDropDownMenuItemsGPA(List<GPA> gpaGrades) {
     List<DropdownMenuItem<GPA>> items = [];
     for (GPA gpa in gpaGrades) {
@@ -41,6 +43,7 @@ class GPACalculate extends ChangeNotifier {
     return items;
   }
 
+  ///this will calculate the gpa from the list
   double calculateGPA(List<CustomDropDownList> myList, CummGPA cummgpa) {
     if (myList == null) {
       notifyListeners();

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gpa_calculator/screens/input_page/animated_logo.dart';
+
 import 'package:gpa_calculator/screens/input_page/cumm_gpa.dart';
 import 'package:gpa_calculator/utilities/custom_button.dart';
 import 'package:gpa_calculator/utilities/router_generator.dart';
@@ -12,22 +14,22 @@ class InputPage extends StatefulWidget {
   }
 }
 
-class InputPageState extends State<InputPage> {
+class InputPageState extends State<InputPage>
+    with SingleTickerProviderStateMixin {
+  //for animating the logo..
+  Animation<double> animation;
+  AnimationController animController;
+
+  //for getting the user's inputs..
   TextEditingController myController = TextEditingController();
   TextEditingController myController2 = TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    myController.dispose();
-    myController2.dispose();
-    super.dispose();
-  }
 
   double cgpa = 0.0, recentGpa = 0.0;
   int tHrs = 0;
   bool error;
   String errorMsg;
+
+  ///this method helps in taking the valid values from user o.w. it gives an error message..
   puttingValues() {
     try {
       cgpa = double.parse(myController.text);
@@ -52,6 +54,7 @@ class InputPageState extends State<InputPage> {
     }
   }
 
+  ///get the preference for getting the recent GPA result..
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     recentGpa = prefs.getDouble('recent_result') ?? 0;
@@ -62,6 +65,34 @@ class InputPageState extends State<InputPage> {
   void initState() {
     super.initState();
     getSharedPrefs();
+    //preparing the animation
+    animController = AnimationController(
+      duration: Duration(seconds: 3),
+      vsync: this,
+    );
+    //for curved animation
+    final curvedAnimation = CurvedAnimation(
+      parent: animController,
+      curve: Curves.bounceIn,
+      reverseCurve: Curves.easeOut,
+    );
+    //initializing the animation and make it animate infinitly
+    animation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(curvedAnimation)
+      ..addStatusListener((status) {
+        //at the end of the animation ->make it reverse
+        if (status == AnimationStatus.completed) {
+          animController.reverse();
+        }
+        //at the beginning of the animation ->make it forward
+        else if (status == AnimationStatus.dismissed) {
+          animController.forward();
+        }
+      });
+
+    animController.forward();
   }
 
   String _recentGpa() {
@@ -71,27 +102,23 @@ class InputPageState extends State<InputPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 40,
-              vertical: 20,
+            padding: EdgeInsets.only(
+              right: size.width * 0.1,
+              left: size.width * 0.1,
+              bottom: size.height * 0.05,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  child: Center(
-                      child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 40,
-                    ),
-                    child: Image.asset('assets/images/gpaLogo.png'),
-                  )),
+                AnimatedLogo(
+                  animation: animation,
+                  size: size,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -207,5 +234,13 @@ class InputPageState extends State<InputPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    myController2.dispose();
+    super.dispose();
   }
 }

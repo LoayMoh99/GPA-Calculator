@@ -10,7 +10,6 @@ import '../input_page/cumm_gpa.dart';
 import 'calculate_gpa.dart';
 
 class SecondPage extends StatefulWidget {
-  final String routeName = "/second";
   final CummGPA cummgpa;
   SecondPage({@required this.cummgpa});
   @override
@@ -18,17 +17,19 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
-  int noCourses;
+  int noCourses = 1;
   List<CustomDropDownList> myList = [];
+  List<TextEditingController> controlerList = [];
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    noCourses = 1;
     Provider.of<GPACalculate>(context)
         .generateCustomDropDownList(noCourses, myList);
+    controlerList.add(TextEditingController());
   }
 
+  ///helper functions for drop down lists
   void onChangedGPAgrade(GPA selectedGPA, int index) {
     setState(() {
       myList[index].selectedGPA = selectedGPA;
@@ -41,17 +42,26 @@ class _SecondPageState extends State<SecondPage> {
     });
   }
 
+  ///this builds each row in the listview..
   Widget rowBuilder(int index) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(top: 16.0),
-          child: Text(
-            'Course ${index + 1}:',
-            style: TextStyle(
-              fontSize: 16,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.25,
+            height: MediaQuery.of(context).size.height * 0.075,
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: "Course ${index + 1}:",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                hintText: "Optional",
+              ),
+              controller: controlerList[index],
             ),
           ),
         ),
@@ -71,6 +81,7 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
+  ///for saving the recent result in the cache of the device for later..
   _saveRecentResult(double gpa) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('recent_result', gpa);
@@ -143,10 +154,12 @@ class _SecondPageState extends State<SecondPage> {
                       text: 'Clear ALL',
                       onPress: () {
                         myList = [];
+                        controlerList = [];
                         noCourses = 1;
                         setState(() {
                           Provider.of<GPACalculate>(context, listen: false)
                               .generateCustomDropDownList(noCourses, myList);
+                          controlerList.add(TextEditingController());
                         });
                       },
                     ),
@@ -157,6 +170,7 @@ class _SecondPageState extends State<SecondPage> {
                         setState(() {
                           Provider.of<GPACalculate>(context, listen: false)
                               .generateCustomDropDownList(noCourses, myList);
+                          controlerList.add(TextEditingController());
                         });
                       },
                     ),
@@ -167,6 +181,7 @@ class _SecondPageState extends State<SecondPage> {
                         setState(() {
                           Provider.of<GPACalculate>(context, listen: false)
                               .generateCustomDropDownList(noCourses, myList);
+                          controlerList.add(TextEditingController());
                         });
                       },
                     ),
@@ -195,5 +210,12 @@ class _SecondPageState extends State<SecondPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    myList.clear();
+    controlerList.clear();
+    super.dispose();
   }
 }
