@@ -29,31 +29,6 @@ class InputPageState extends State<InputPage>
   bool error;
   String errorMsg;
 
-  ///this method helps in taking the valid values from user o.w. it gives an error message..
-  puttingValues() {
-    try {
-      cgpa = double.parse(myController.text);
-      tHrs = int.parse(myController2.text);
-      error = false;
-      if (tHrs.isNegative) {
-        error = true;
-        errorMsg = "Hours can't be negative";
-      } else if (cgpa.isNegative) {
-        error = true;
-        errorMsg = "GPA can't be negative";
-      } else if (cgpa > 4.0) {
-        error = true;
-        errorMsg = "GPA can't be more than 4.0";
-      } else if ((cgpa == 0.0 && tHrs > 0) || (cgpa > 0 && tHrs == 0)) {
-        tHrs = 0;
-        cgpa = 0;
-      }
-    } catch (Exception) {
-      error = true;
-      errorMsg = "Please write the data correctly and don't leave it empty..";
-    }
-  }
-
   ///get the preference for getting the recent GPA result..
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -93,6 +68,31 @@ class InputPageState extends State<InputPage>
       });
 
     animController.forward();
+  }
+
+  ///this method helps in taking the valid values from user o.w. it gives an error message..
+  puttingValues() {
+    try {
+      cgpa = double.parse(myController.text);
+      tHrs = int.parse(myController2.text);
+      error = false;
+      if (tHrs.isNegative) {
+        error = true;
+        errorMsg = "Hours can't be negative";
+      } else if (cgpa.isNegative) {
+        error = true;
+        errorMsg = "GPA can't be negative";
+      } else if (cgpa > 4.0) {
+        error = true;
+        errorMsg = "GPA can't be more than 4.0";
+      } else if ((cgpa == 0.0 && tHrs > 0) || (cgpa > 0 && tHrs == 0)) {
+        tHrs = 0;
+        cgpa = 0;
+      }
+    } catch (Exception) {
+      error = true;
+      errorMsg = "Please write the data correctly and don't leave it empty..";
+    }
   }
 
   String _recentGpa() {
@@ -239,6 +239,7 @@ class InputPageState extends State<InputPage>
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
+    animController.dispose();
     myController.dispose();
     myController2.dispose();
     super.dispose();
