@@ -1,4 +1,4 @@
-package com.example.studyjam
+package com.lmhm.gpacalculator
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

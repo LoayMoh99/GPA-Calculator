@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gpa_calculator/utilities/my_theme.dart';
 import 'package:gpa_calculator/utilities/router_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,7 @@ class _SecondPageState extends State<SecondPage> {
 
   ///helper functions for drop down lists
   void onChangedGPAgrade(GPA selectedGPA, int index) {
+    //FocusScope.of(context).requestFocus(new FocusNode());
     setState(() {
       myList[index].selectedGPA = selectedGPA;
     });
@@ -48,22 +50,32 @@ class _SecondPageState extends State<SecondPage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.25,
-            height: MediaQuery.of(context).size.height * 0.075,
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: "Course ${index + 1}:",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                hintText: "Optional",
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Text(
+                '${index + 1}.',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              controller: controlerList[index],
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.25,
+                height: MediaQuery.of(context).size.height * 0.075,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Course Name:',
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: myTheme.accentColor),
+                    ),
+                  ),
+                  controller: controlerList[index],
+                ),
+              ),
+            ),
+          ],
         ),
 
         //two dropdownboxes for hours and expected grade
@@ -71,11 +83,17 @@ class _SecondPageState extends State<SecondPage> {
           value: myList[index].selectedGPA,
           items: myList[index].dropdownMenuItemsGPA,
           onChanged: (GPA gpa) => onChangedGPAgrade(gpa, index),
+          onTap: () {
+            FocusManager.instance.primaryFocus.unfocus();
+          },
         ),
         DropdownButton<int>(
           value: myList[index].selectedHours,
           items: myList[index].dropdownMenuItemsCHS,
           onChanged: (int chs) => onChangedCreditHours(chs, index),
+          onTap: () {
+            FocusManager.instance.primaryFocus.unfocus();
+          },
         ),
       ],
     );
@@ -103,7 +121,7 @@ class _SecondPageState extends State<SecondPage> {
                   itemCount: noCourses,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: EdgeInsets.only(bottom: 14),
+                      padding: EdgeInsets.only(bottom: 10),
                       child: rowBuilder(index),
                     );
                   },
